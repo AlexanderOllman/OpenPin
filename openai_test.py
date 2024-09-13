@@ -11,8 +11,8 @@ from picamera2 import Picamera2
 from libcamera import controls
 
 
-api_key = os.environ.get("OPENAI_API_KEY")
-client = openai.OpenAI(api_key=api_key)
+# api_key = os.environ.get("OPENAI_API_KEY")
+client = openai.OpenAI()
 
 # Initialize the camera
 picam2 = Picamera2()
