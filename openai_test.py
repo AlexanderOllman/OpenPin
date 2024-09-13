@@ -2,51 +2,49 @@ from flask import Flask, render_template_string, Response
 import json
 import random
 import base64
-import cv2
 import numpy as np
 import openai
 from io import BytesIO
 from PIL import Image
 import os
+from picamera2 import Picamera2
+from libcamera import controls
 
 app = Flask(__name__)
 
 api_key = os.environ.get("OPENAI_API_KEY")
 client = openai.OpenAI(api_key=api_key)
 
+# Initialize the camera
+picam2 = Picamera2()
+config = picam2.create_still_configuration()
+picam2.configure(config)
+picam2.start()
+
 def capture_frame():
-    cap = cv2.VideoCapture(0)
-    ret, frame = cap.read()
-    cap.release()
-
-    if ret:
-        # Increase brightness
-        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        h, s, v = cv2.split(hsv)
-        v = cv2.add(v, 30)  # Increase brightness by 30
-        v[v > 255] = 255  # Cap at 255 to avoid overflow
-        final_hsv = cv2.merge((h, s, v))
-        frame = cv2.cvtColor(final_hsv, cv2.COLOR_HSV2BGR)
-
-        print(f"Captured frame shape: {frame.shape}")
-    else:
-        print("Failed to capture frame")
+    # Capture a frame
+    frame = picam2.capture_array()
     
+    # Increase brightness
+    picam2.set_controls({"Brightness": 1})  # Adjust as needed
+    
+    print(f"Captured frame shape: {frame.shape}")
     return frame
 
 def encode_image(frame):
-    # Ensure the frame is in BGR color space (OpenCV default)
-    if len(frame.shape) == 2:  # If grayscale, convert to BGR
-        frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+    # Convert to RGB (picamera2 captures in RGB format)
+    image = Image.fromarray(frame)
     
-    _, buffer = cv2.imencode('.jpg', frame)
-    img_bytes = BytesIO(buffer).getvalue()
-    return base64.b64encode(img_bytes).decode('utf-8')
+    # Save image to bytes
+    img_byte_arr = BytesIO()
+    image.save(img_byte_arr, format='JPEG')
+    img_byte_arr = img_byte_arr.getvalue()
+    
+    return base64.b64encode(img_byte_arr).decode('utf-8')
 
 def send_image(frame):
     base64_image = encode_image(frame)
     
-    # system_prompt = "Under California Driving Law, what is the answer to this question? Provide your answer in json format, with fields 'question', 'answer', and 'answering_letter'."
     system_prompt = "describe what is in this image"
     response = client.chat.completions.create(
         model="gpt-4o",
@@ -73,3 +71,6 @@ def send_image(frame):
 frame = capture_frame()
 response = send_image(frame)
 print(response)
+
+# Don't forget to stop the camera when you're done
+picam2.stop()
