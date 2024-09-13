@@ -43,7 +43,7 @@ def encode_image(frame):
     img_bytes = BytesIO(buffer).getvalue()
     return base64.b64encode(img_bytes).decode('utf-8')
 
-def get_quiz_data(frame):
+def send_image(frame):
     base64_image = encode_image(frame)
     
     # system_prompt = "Under California Driving Law, what is the answer to this question? Provide your answer in json format, with fields 'question', 'answer', and 'answering_letter'."
@@ -68,4 +68,8 @@ def get_quiz_data(frame):
     )
     
     content = response.choices[0].message.content
-    print("Raw response:", content)  # For debugging
+    return content
+
+frame = capture_frame()
+response = send_image(frame)
+print(response)
