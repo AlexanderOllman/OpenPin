@@ -10,7 +10,6 @@ import os
 from picamera2 import Picamera2
 from libcamera import controls
 
-app = Flask(__name__)
 
 api_key = os.environ.get("OPENAI_API_KEY")
 client = openai.OpenAI(api_key=api_key)
