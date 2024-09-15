@@ -3,7 +3,7 @@ from datetime import datetime
 from io import BytesIO
 
 picam2 = Picamera2()
-camera_config = picam2.create_still_configuration()
+camera_config = picam2.create_preview_configuration()
 picam2.configure(camera_config)
 picam2.start()
 

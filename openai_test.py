@@ -16,9 +16,12 @@ client = openai.OpenAI()
 
 # Initialize the camera
 picam2 = Picamera2()
-config = picam2.create_still_configuration()
-picam2.configure(config)
+camera_config = picam2.create_still_configuration()
+picam2.configure(camera_config)
 picam2.start()
+
+print("Camera is ready. Press Enter to capture an image, or type 'exit' to quit.")
+
 
 def capture_frame():
     # Capture a frame
@@ -67,9 +70,34 @@ def send_image(frame):
     content = response.choices[0].message.content
     return content
 
-frame = capture_frame()
-response = send_image(frame)
-print(response)
+
+while True:
+    user_input = input()
+    
+    if user_input.lower() == 'exit':
+        print("Exiting the program.")
+        break
+    
+    # Create a BytesIO object to hold the image data
+    my_stream = BytesIO()
+    
+    # Capture the image to the BytesIO stream
+    picam2.capture_file(my_stream, format='jpeg')
+    
+    # Reset the stream position to the beginning
+    my_stream.seek(0)
+
+    frame = my_stream.getvalue()
+
+    response = send_image(frame)
+
+    print(f"Response: {response}")
+    
+    # If you want to process the image data in memory, you can do so here
+    # For example: image_data = my_stream.getvalue()
+    
+    # Clear the stream for the next capture
+    my_stream.close()
 
 # Don't forget to stop the camera when you're done
 picam2.stop()
