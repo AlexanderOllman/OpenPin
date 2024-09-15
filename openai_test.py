@@ -34,15 +34,7 @@ def capture_frame():
     return frame
 
 def encode_image(frame):
-    # Convert to RGB (picamera2 captures in RGB format)
-    image = Image.fromarray(frame)
-    
-    # Save image to bytes
-    img_byte_arr = BytesIO()
-    image.save(img_byte_arr, format='JPEG')
-    img_byte_arr = img_byte_arr.getvalue()
-    
-    return base64.b64encode(img_byte_arr).decode('utf-8')
+    return base64.b64encode(frame).decode('utf-8')
 
 def send_image(frame):
     base64_image = encode_image(frame)
