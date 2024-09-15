@@ -16,7 +16,7 @@ client = openai.OpenAI()
 
 # Initialize the camera
 picam2 = Picamera2()
-camera_config = picam2.create_still_configuration()
+camera_config = picam2.create_preview_configuration(main={"size": (1920, 1080)})
 picam2.configure(camera_config)
 picam2.start()
 
