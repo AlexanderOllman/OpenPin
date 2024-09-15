@@ -9,6 +9,8 @@ from PIL import Image
 import os
 from picamera2 import Picamera2
 from libcamera import controls
+from picamera2.transforms import Rotate
+
 
 
 # api_key = os.environ.get("OPENAI_API_KEY")
@@ -16,7 +18,7 @@ client = openai.OpenAI()
 
 # Initialize the camera
 picam2 = Picamera2()
-camera_config = picam2.create_preview_configuration(main={"size": (1920, 1080)})
+camera_config = picam2.create_preview_configuration(main={"size": (1920, 1080)}, transform=Rotate(180))
 picam2.configure(camera_config)
 picam2.start()
 
