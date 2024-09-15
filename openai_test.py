@@ -38,7 +38,7 @@ def encode_image(frame):
 
 def send_image(frame):
     base64_image = encode_image(frame)
-    
+    print("Image encoded successfully.")
     system_prompt = "describe what is in this image"
     response = client.chat.completions.create(
         model="gpt-4o",
@@ -55,9 +55,9 @@ def send_image(frame):
                     },
                 ],
             }
-        ],
-        max_tokens=300,
+        ]
     )
+    print("Responded.")
     
     content = response.choices[0].message.content
     return content
@@ -80,6 +80,8 @@ while True:
     my_stream.seek(0)
 
     frame = my_stream.getvalue()
+
+    print("Image captured.")
 
     response = send_image(frame)
 
