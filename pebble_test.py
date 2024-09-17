@@ -8,5 +8,5 @@ pebble = PebbleConnection(SerialTransport("/dev/rfcomm0"))
 pebble.connect()
 # pebble.run_async()
 
-n = Notifications(pebble, None)
-n.send_notification("Subject", "Message", "From")
+while pebble.connected:
+    pebble.pump_reader()
