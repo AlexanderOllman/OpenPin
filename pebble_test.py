@@ -6,7 +6,7 @@ from libpebble2.services.notifications import Notifications
 
 pebble = PebbleConnection(SerialTransport("/dev/rfcomm0"))
 pebble.connect()
-pebble.run_async()
+# pebble.run_async()
 
 n = Notifications(pebble, None)
 n.send_notification("Subject", "Message", "From")
